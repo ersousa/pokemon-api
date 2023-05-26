@@ -4,6 +4,7 @@ import com.pokemon.pokemonapi.domain.dto.ErrorDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 public class PokemonControllerAdvice {
 
     @ExceptionHandler(value = WebClientResponseException.NotFound.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDTO notFoundException(final WebClientResponseException.NotFound notFoundException){
         return new ErrorDTO()
                 .builder()

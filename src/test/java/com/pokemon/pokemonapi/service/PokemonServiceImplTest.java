@@ -10,8 +10,8 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.Mockito.*;
@@ -41,6 +41,14 @@ public class PokemonServiceImplTest {
     @BeforeEach
     void setup() {
         defaultPokemon = createDefaultPokemon();
+        setWebClientMock();
+    }
+
+    private void setWebClientMock() {
+        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
+        when(requestHeadersUriSpecMock.uri(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+
     }
 
     private Pokemon createDefaultPokemon() {
@@ -51,13 +59,20 @@ public class PokemonServiceImplTest {
 
     @Test
     public void shouldGetPokemonByNameWithSuccess() {
-        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
-        when(requestHeadersUriSpecMock.uri(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
-        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
         when(responseSpecMock.bodyToMono(
                 ArgumentMatchers.<Class<Pokemon>>notNull())).thenReturn(Mono.just(defaultPokemon));
-
         Pokemon response = service.getByName("pokename").getBody();
         Assertions.assertEquals(defaultPokemon, response);
     }
+
+    @Test
+    public void shouldReturnNotFoundWhenIsAnInvalidPokemonName(){
+        when(responseSpecMock.bodyToMono(
+                ArgumentMatchers.<Class<Pokemon>>notNull())).thenThrow(WebClientResponseException.NotFound.class);
+        Exception exception = Assertions.assertThrows(WebClientResponseException.NotFound.class,
+                () -> service.getByName("notAValidPokemon").getBody());
+
+        Assertions.assertEquals(WebClientResponseException.NotFound.class, exception.getClass());
+    }
 }
+
