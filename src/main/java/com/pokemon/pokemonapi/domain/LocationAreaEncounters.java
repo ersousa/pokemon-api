@@ -1,4 +1,4 @@
-package com.pokemon.pokemonapi.domain.dto;
+package com.pokemon.pokemonapi.domain;
 
 import lombok.Data;
 

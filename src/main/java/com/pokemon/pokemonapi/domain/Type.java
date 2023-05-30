@@ -1,9 +1,9 @@
-package com.pokemon.pokemonapi.domain.dto;
+package com.pokemon.pokemonapi.domain;
 
 import lombok.Data;
 
 @Data
-public class Stat {
+public class Type {
     private String name;
     private String url;
 }

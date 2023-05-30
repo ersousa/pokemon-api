@@ -1,6 +1,6 @@
 package com.pokemon.pokemonapi.service;
 
-import com.pokemon.pokemonapi.domain.dto.Pokemon;
+import com.pokemon.pokemonapi.domain.Pokemon;
 import com.pokemon.pokemonapi.service.impl.PokemonServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

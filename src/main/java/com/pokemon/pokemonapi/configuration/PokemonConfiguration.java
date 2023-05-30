@@ -13,6 +13,7 @@ public class PokemonConfiguration {
         return builder
                 .baseUrl("https://pokeapi.co/api/v2")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(-1))
                 .build();
     }
 }

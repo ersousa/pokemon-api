@@ -1,5 +1,6 @@
 package com.pokemon.pokemonapi.domain.dto;
 
+import com.pokemon.pokemonapi.domain.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
