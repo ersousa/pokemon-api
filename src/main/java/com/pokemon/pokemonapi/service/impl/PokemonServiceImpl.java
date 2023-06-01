@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 @Service
 @Slf4j
@@ -23,42 +24,56 @@ public class PokemonServiceImpl implements PokemonService {
     private final WebClient webClient;
     private static final String URI_POKEMON = "/pokemon/{name}";
     private static final String URI_POKEMON_SPECIES = "/pokemon-species/{name}";
+
     @Override
     public ResponseEntity<PokemonDTO> getByName(String name) {
+        log.info("Searching infos for Pokemon {}", name);
         Pokemon pokemon =
                 webClient
-                .get()
-                .uri(URI_POKEMON, name)
-                .retrieve()
-                .bodyToMono(Pokemon.class).block();
-        return new ResponseEntity(PokemonDTO.getFromEntity(pokemon), HttpStatus.OK);
+                        .get()
+                        .uri(URI_POKEMON, name)
+                        .retrieve()
+                        .bodyToMono(Pokemon.class).block();
+        return new ResponseEntity<>(PokemonDTO.getFromEntity(pokemon), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<EvolutionaryLineDTO> getEvolutionLineByName(String name) {
+        log.info("Searching evolutionary line for {}", name);
         EvolutionaryLineDTO evolutionaryLineDTO = new EvolutionaryLineDTO();
         List<String> forms = new ArrayList<>();
-        PokemonSpecie pokemonSpecie =
-                webClient
-                        .get()
-                        .uri(URI_POKEMON_SPECIES, name)
-                        .retrieve()
-                        .bodyToMono(PokemonSpecie.class).block();
+        EvolutionaryLine evolutionaryLine = null;
 
-        EvolutionaryLine evolutionaryLine = webClient
-                .get()
-                .uri(pokemonSpecie.getEvolutionChain().getUrl())
-                .retrieve()
-                .bodyToMono(EvolutionaryLine.class).block();
+        PokemonSpecie pokemonSpecie = getSpecie(name);
 
-        if(Objects.nonNull(evolutionaryLine) && Objects.nonNull(evolutionaryLine.getChain())
-        && Objects.nonNull(evolutionaryLine.getChain().getEvolvesTo())){
+        if (Objects.nonNull(pokemonSpecie) && Objects.nonNull(pokemonSpecie.getEvolutionChain())) {
+            evolutionaryLine = getEvolutionaryLine(pokemonSpecie);
+        }
+
+        if (Objects.nonNull(evolutionaryLine) && Objects.nonNull(evolutionaryLine.getChain())
+                && Objects.nonNull(evolutionaryLine.getChain().getEvolvesTo())) {
             forms = evolutionaryLine.getChain().getEvolvesTo().stream()
                     .map(Evolution::getSpecies)
                     .map(Specie::getName).toList();
         }
 
         evolutionaryLineDTO.setForms(forms);
-        return new ResponseEntity(evolutionaryLineDTO, HttpStatus.OK);
+        return new ResponseEntity<>(evolutionaryLineDTO, HttpStatus.OK);
+    }
+
+    private EvolutionaryLine getEvolutionaryLine(PokemonSpecie pokemonSpecie) {
+        return webClient
+                .get()
+                .uri(pokemonSpecie.getEvolutionChain().getUrl())
+                .retrieve()
+                .bodyToMono(EvolutionaryLine.class).block();
+    }
+
+    private PokemonSpecie getSpecie(String name) {
+        return webClient
+                .get()
+                .uri(URI_POKEMON_SPECIES, name)
+                .retrieve()
+                .bodyToMono(PokemonSpecie.class).block();
     }
 }

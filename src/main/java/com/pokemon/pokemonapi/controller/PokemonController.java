@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(path = "/pokemons")
 @RequiredArgsConstructor
@@ -22,12 +20,12 @@ public class PokemonController {
     private final PokemonService pokemonService;
 
     @GetMapping("/{name}")
-    private ResponseEntity<PokemonDTO> getByName(@PathVariable("name") final String name ){
+    public ResponseEntity<PokemonDTO> getByName(@PathVariable("name") final String name ){
         return pokemonService.getByName(name);
     }
 
     @GetMapping("/{name}/evolutionLine")
-    private ResponseEntity<EvolutionaryLineDTO> getEvolutionLineByName(@PathVariable("name") final String name ){
+    public ResponseEntity<EvolutionaryLineDTO> getEvolutionLineByName(@PathVariable("name") final String name ){
         return pokemonService.getEvolutionLineByName(name);
     }
 
