@@ -1,6 +1,8 @@
 package com.pokemon.pokemonapi.service;
 
-import com.pokemon.pokemonapi.domain.Pokemon;
+import com.pokemon.pokemonapi.domain.*;
+import com.pokemon.pokemonapi.domain.dto.EvolutionaryLineDTO;
+import com.pokemon.pokemonapi.domain.dto.PokemonDTO;
 import com.pokemon.pokemonapi.service.impl.PokemonServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
 
 import static org.mockito.Mockito.*;
 
@@ -35,19 +39,36 @@ public class PokemonServiceImplTest {
     @Mock
     private WebClient.ResponseSpec responseSpecMock;
 
+    @Mock
+    private WebClient.ResponseSpec evolutionaryLineMock;
+
     private Pokemon defaultPokemon;
+
+    private PokemonSpecie defaultSpecie;
+
+    private EvolutionaryLine evolutionaryLine;
+    private EvolutionaryLineDTO defaultEvolutionaryLineDTO;
 
 
     @BeforeEach
     void setup() {
         defaultPokemon = createDefaultPokemon();
+        defaultSpecie = createDefaultSpecie();
+        evolutionaryLine = createEvolutionaryLine();
+        defaultEvolutionaryLineDTO = createDefaultEvolutionaryLineDTO();
         setWebClientMock();
     }
+
 
     private void setWebClientMock() {
         when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+    }
+    private void setEvolutionaryLineMock() {
+        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
+        when(requestHeadersUriSpecMock.uri(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
+        when(requestHeadersSpecMock.retrieve()).thenReturn(evolutionaryLineMock);
 
     }
 
@@ -57,12 +78,34 @@ public class PokemonServiceImplTest {
         return pokemon;
     }
 
+    private PokemonSpecie createDefaultSpecie() {
+        PokemonSpecie specie = new PokemonSpecie();
+        EvolutionChainUrl evolutionChainUrl = new EvolutionChainUrl();
+        evolutionChainUrl.setUrl("teste");
+        specie.setEvolutionChain(evolutionChainUrl);
+        return specie;
+    }
+
+    private EvolutionaryLine createEvolutionaryLine() {
+        EvolutionaryLine evolutionaryLine = new EvolutionaryLine();
+        EvolutionChain evolutionChain = new EvolutionChain();
+        evolutionChain.setEvolvesTo(new ArrayList<>());
+        evolutionaryLine.setChain(evolutionChain);
+        return evolutionaryLine;
+    }
+
+    private EvolutionaryLineDTO createDefaultEvolutionaryLineDTO() {
+        EvolutionaryLineDTO evolutionaryLineDTO = new EvolutionaryLineDTO();
+        evolutionaryLineDTO.setForms(new ArrayList<>());
+        return evolutionaryLineDTO;
+    }
+
     @Test
     public void shouldGetPokemonByNameWithSuccess() {
         when(responseSpecMock.bodyToMono(
                 ArgumentMatchers.<Class<Pokemon>>notNull())).thenReturn(Mono.just(defaultPokemon));
-        Pokemon response = service.getByName("pokename").getBody();
-        Assertions.assertEquals(defaultPokemon, response);
+        PokemonDTO response = service.getByName("pokename").getBody();
+        Assertions.assertEquals(PokemonDTO.getFromEntity(defaultPokemon), response);
     }
 
     @Test
@@ -74,5 +117,6 @@ public class PokemonServiceImplTest {
 
         Assertions.assertEquals(WebClientResponseException.NotFound.class, exception.getClass());
     }
+
 }
 

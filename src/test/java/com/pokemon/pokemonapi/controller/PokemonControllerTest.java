@@ -35,4 +35,12 @@ public class PokemonControllerTest {
         ).andDo(MockMvcResultHandlers.print());
         Mockito.verify(service, Mockito.times(1)).getByName("pikachu");
     }
+
+    @Test
+    public void shouldGetEvolutionLineByNameWithSuccess() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/pokemons/{name}/evolutionLine", "pikachu")
+        ).andDo(MockMvcResultHandlers.print());
+        Mockito.verify(service, Mockito.times(1)).getEvolutionLineByName("pikachu");
+    }
 }

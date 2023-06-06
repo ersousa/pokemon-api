@@ -62,8 +62,6 @@ public class DtoTest {
         pokemon.equals(new Pokemon());
         pokemon.equals("");
         pokemon.hashCode();
-        pokemon.canEqual(new Pokemon());
-
     }
 
     @Test
