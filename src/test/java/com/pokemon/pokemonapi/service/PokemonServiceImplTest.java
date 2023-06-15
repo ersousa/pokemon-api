@@ -18,10 +18,11 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PokemonServiceImplTest {
+class PokemonServiceImplTest {
     @InjectMocks
     private PokemonServiceImpl service;
 
@@ -38,9 +39,6 @@ public class PokemonServiceImplTest {
 
     @Mock
     private WebClient.ResponseSpec responseSpecMock;
-
-    @Mock
-    private WebClient.ResponseSpec evolutionaryLineMock;
 
     private Pokemon defaultPokemon;
 
@@ -64,12 +62,6 @@ public class PokemonServiceImplTest {
         when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
         when(requestHeadersUriSpecMock.uri(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
         when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
-    }
-    private void setEvolutionaryLineMock() {
-        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
-        when(requestHeadersUriSpecMock.uri(anyString(), anyString())).thenReturn(requestHeadersSpecMock);
-        when(requestHeadersSpecMock.retrieve()).thenReturn(evolutionaryLineMock);
-
     }
 
     private Pokemon createDefaultPokemon() {
@@ -101,7 +93,7 @@ public class PokemonServiceImplTest {
     }
 
     @Test
-    public void shouldGetPokemonByNameWithSuccess() {
+    void shouldGetPokemonByNameWithSuccess() {
         when(responseSpecMock.bodyToMono(
                 ArgumentMatchers.<Class<Pokemon>>notNull())).thenReturn(Mono.just(defaultPokemon));
         PokemonDTO response = service.getByName("pokename").getBody();
@@ -109,13 +101,18 @@ public class PokemonServiceImplTest {
     }
 
     @Test
-    public void shouldReturnNotFoundWhenIsAnInvalidPokemonName(){
+    void shouldReturnNotFoundWhenIsAnInvalidPokemonName(){
         when(responseSpecMock.bodyToMono(
                 ArgumentMatchers.<Class<Pokemon>>notNull())).thenThrow(WebClientResponseException.NotFound.class);
         Exception exception = Assertions.assertThrows(WebClientResponseException.NotFound.class,
                 () -> service.getByName("notAValidPokemon").getBody());
 
         Assertions.assertEquals(WebClientResponseException.NotFound.class, exception.getClass());
+    }
+
+//    @Test
+    void shouldGetEvolutionaryLineWithSuccess(){
+
     }
 
 }
