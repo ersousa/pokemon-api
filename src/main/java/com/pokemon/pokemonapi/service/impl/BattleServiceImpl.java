@@ -6,6 +6,7 @@ import com.pokemon.pokemonapi.domain.dto.BattleResponseDTO;
 import com.pokemon.pokemonapi.domain.dto.PokemonDTO;
 import com.pokemon.pokemonapi.service.BattleService;
 import com.pokemon.pokemonapi.service.PokemonService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,11 @@ public class BattleServiceImpl implements BattleService {
 
         ResponseEntity<PokemonDTO> challenger = pokemonService.getByName(requestDTO.getChallenger());
         ResponseEntity<PokemonDTO> challenged = pokemonService.getByName(requestDTO.getChallenged());
+
+        if(HttpStatus.SERVICE_UNAVAILABLE.equals(challenger.getStatusCode())
+            || HttpStatus.SERVICE_UNAVAILABLE.equals(challenged.getStatusCode())){
+            return new ResponseEntity<>(new BattleResponseDTO("Battle unavailable :("), HttpStatus.SERVICE_UNAVAILABLE);
+        }
 
         log.info("Starting battle between {} and {}", requestDTO.getChallenger(), requestDTO.getChallenged());
         Integer result = getTotalStats(challenger).compareTo(getTotalStats(challenged));
