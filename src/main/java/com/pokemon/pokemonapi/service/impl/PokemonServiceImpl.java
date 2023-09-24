@@ -43,10 +43,13 @@ public class PokemonServiceImpl implements PokemonService {
     }
 
     private ResponseEntity<PokemonDTO> getPokemonByNameFallBack(String name, Throwable exception){
+        log.info("Searching {} in cache", name);
         PokemonDTO pokemonDTO = POKEMON_CACHE.get(name);
         if(Objects.nonNull(pokemonDTO)){
             return new ResponseEntity<>(pokemonDTO, HttpStatus.OK);
         }
+
+        log.info("Nothing found in cache :(");
         return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
     }
 

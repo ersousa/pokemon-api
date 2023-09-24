@@ -3,3 +3,4 @@ resilience4j.circuitbreaker:
     getPokemonByNameCircuitBreak:
       minimumNumberOfCalls: 4
       slidingWindowSize: 8
+      permittedNumberOfCallsInHalfOpenState: 1

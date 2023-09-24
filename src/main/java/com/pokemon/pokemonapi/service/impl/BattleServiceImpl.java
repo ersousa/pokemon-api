@@ -44,6 +44,8 @@ public class BattleServiceImpl implements BattleService {
         } else if(result < 0){
             winner = requestDTO.getChallenged();
         }
+
+        log.info("Battle succeed!! the winner is: " + winner);
         return new ResponseEntity<>(new BattleResponseDTO(winner), HttpStatus.OK);
     }
 
